@@ -1,6 +1,3 @@
-/*
- * 
- */
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -167,7 +164,7 @@ public class ssusiRender
 		cbLayer    = new JComboBox<String>(numbers);
 		cbVariable = new JComboBox<String>(variables);
 		cbLayer.setSelectedIndex(3);
-		cbLayer.setMaximumSize(new Dimension(50, 50));
+		cbLayer.setMaximumSize(new Dimension(100, 50));
 
 		fileName = new TextField(60);
 
@@ -322,25 +319,7 @@ public class ssusiRender
 
 						// grab the file
 						NetcdfFile file       = NetcdfFile.open(current.getPath());
-
-						// Variables from information in the CDF file
-						Variable   year       = file.findVariable("YEAR");
-						Variable   day        = file.findVariable("DOY");
-						Variable   time       = file.findVariable("TIME");
-						int        yearInt    = year.read().getInt(0);
-						int        dayInt     = day.read().getInt(0);
-						double     timeDouble = time.read().getDouble(0);
-
-						// file information output
-						numOfNum.setText("<html>" + index + " of " + (directory.size() - 1) + "<br>Year: "
-								+ yearInt + " Day: " + dayInt + "<br>" + ssusiUtils.secondsToTime(timeDouble)
-								+ "</html>");
-
-						// this changes depending on what the user has selected
-						// as the target hemisphere
-						Variable      var    = file.findVariable((String) cbVariable.getSelectedItem());
-						Array         data3d = var.read();
-						ArrayFloat.D3 data   = (ArrayFloat.D3) data3d;
+						ArrayFloat.D3 data   = (ArrayFloat.D3) file.findVariable((String) cbVariable.getSelectedItem()).read();
 
 						// i, j, and k variables are used as physics vectors
 						// to describe the data location inside the 3D array
@@ -356,6 +335,20 @@ public class ssusiRender
 								else
 									map.setRGB(k, j, ssusiUtils.getColorFromValue((int) data.get(i, j, k), bucketSize));
 							}
+						mapView.repaint();
+						
+						// Variables from information in the CDF file
+						Variable   year       = file.findVariable("YEAR");
+						Variable   day        = file.findVariable("DOY");
+						Variable   time       = file.findVariable("TIME");
+						int        yearInt    = year.read().getInt(0);
+						int        dayInt     = day.read().getInt(0);
+						double     timeDouble = time.read().getDouble(0);
+
+						// file information output
+						numOfNum.setText("<html>" + index + " of " + (directory.size() - 1) + "<br>Year: "
+								+ yearInt + " Day: " + dayInt + "<br>" + ssusiUtils.secondsToTime(timeDouble)
+								+ "</html>");
 					}
 					Graphics2D outlines = map.createGraphics();
 					outlines.setColor(new Color(150, 150, 150));
@@ -593,8 +586,9 @@ public class ssusiRender
 						ArrayFloat.D3 data   = (ArrayFloat.D3) data3d;
 
 						int i = cbLayer.getSelectedIndex();
-						int j = mapView.getMousePosition().x;
+						int j = mapView.getMousePosition().x-1;
 						int k = mapView.getMousePosition().y-15;
+						
 						dataValue.setText("Value:" + (int)(data.get(i, k, j)) + " R");
                     }
                     catch (IOException iox)

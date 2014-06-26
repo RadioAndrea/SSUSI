@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ucar.nc2.NetcdfFile;
-import ucar.nc2.Variable;
 
 public class ssusiUtils
 {
@@ -98,14 +97,8 @@ public class ssusiUtils
 			try
 			{
 				file             = NetcdfFile.open(directory.get(a).getPath());
-
-				Variable day     = file.findVariable("DOY");
-				int      dayInt  = day.read().getInt(0);
-				Variable time    = file.findVariable("TIME");
-
-				// time from year start in seconds, integer for precision
-				int      timeInt = (int) (time.read().getDouble(0) + dayInt * 86400);
-
+				int      dayInt  = file.findVariable("DOY").read().getInt(0);
+				int      timeInt = (int) (file.findVariable("TIME").read().getDouble(0) + dayInt * 86400);
 				nums.add(a, timeInt);
 			}
 			catch (IOException e)
@@ -128,6 +121,8 @@ public class ssusiUtils
 	 */
 	private static ArrayList<File> sort(ArrayList<File> files, ArrayList<Integer> nums)
 	{
+		//TODO This is slow, needs to be much faster
+		//need to find a new sorting algorithm
 		boolean unsorted = true;
 		File    tempFile = null;
 		int     tempInt  = -1;
@@ -202,52 +197,53 @@ public class ssusiUtils
 	 */
 	public static int getColorFromValue(int value, int bucket)
 	{
+		//TODO Change this to be a loop
+		if(value <= 0)
+			return 0;
 		int a = 0;
 		int b = 0;
 		int c = 0;
+		
+		b       = value / bucket;
+		value  -= 255 * bucket;
+
 		if (value > 0)
 		{
-			b       = value / bucket;
+			b       = 255;
+			a       = value / bucket;
 			value  -= 255 * bucket;
 
 			if (value > 0)
 			{
-				b       = 255;
-				a       = value / bucket;
+				a       = 255;
+				b      -= value / bucket;
 				value  -= 255 * bucket;
 
 				if (value > 0)
 				{
-					a       = 255;
-					b      -= value / bucket;
+					b       = 0;
+					c       = value / bucket;
 					value  -= 255 * bucket;
 
 					if (value > 0)
 					{
-						b       = 0;
-						c       = value / bucket;
+						c       = 255;
+						a      -= value / bucket;
 						value  -= 255 * bucket;
 
 						if (value > 0)
 						{
-							c       = 255;
-							a      -= value / bucket;
+							a       = 0;
+							b       = value / bucket;
 							value  -= 255 * bucket;
 
 							if (value > 0)
 							{
-								a       = 0;
-								b       = value / bucket;
-								value  -= 255 * bucket;
+								b = 255;
+								a = value / bucket;
 
-								if (value > 0)
-								{
-									b = 255;
-									a = value / bucket;
-
-									if (a > 256)
-										a = 255;
-								}
+								if (a > 256)
+									a = 255;
 							}
 						}
 					}
