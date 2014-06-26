@@ -10,6 +10,9 @@ import java.awt.Graphics2D;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -85,7 +88,10 @@ public class ssusiRender
 	private JLabel            numOfNum;
 
 	/** The upper label for the color bar. */
-	private JLabel            cBarHigh;
+	private JLabel            cBarHigh; 
+	
+	/** A label to show the data value of the current pixel */
+	private JLabel			  dataValue;
 
 	/** The bucket size. */
 	private int               bucketSize = 5;
@@ -161,8 +167,10 @@ public class ssusiRender
 		mapView          = new JLabel(new ImageIcon(map));
 		cBarHigh         = new JLabel((bucketSize * 1789) + " R");
 		cBar             = new JLabel(new ImageIcon(colorBar));
+		dataValue 		 = new JLabel("");
 		JLabel   cBarLow = new JLabel("0 R");
-
+		
+		mapView.setPreferredSize(new Dimension(363,363));
 		cbLayer    = new JComboBox<String>(numbers);
 		cbVariable = new JComboBox<String>(variables);
 		cbLayer.setSelectedIndex(3);
@@ -210,6 +218,7 @@ public class ssusiRender
 		right.add(btMltExecute);
 		right.add(lbBox);
 		right.add(cbLayer);
+		right.add(dataValue);
 		frame.add(right, BorderLayout.EAST);
 
 		// center GUI elements
@@ -292,7 +301,7 @@ public class ssusiRender
 		{
 			public void actionPerformed(ActionEvent back)
 			{
-				if (--index < 0)
+				if (--index > 0)
 					current = directory.get(index);
 				else
 				{
@@ -611,6 +620,38 @@ public class ssusiRender
 				}
 			}
 		});
+		
+		mapView.addMouseListener(new MouseAdapter()
+		{
+
+			@Override
+            public void mouseClicked(MouseEvent e)
+            {
+				if(current != null)
+				{
+					try
+                    {
+	                    NetcdfFile file = NetcdfFile.open(current.getPath());
+	                    
+						Variable      var    = file.findVariable((String) cbVariable.getSelectedItem());
+						Array         data3d = var.read();
+						ArrayFloat.D3 data   = (ArrayFloat.D3) data3d;
+
+						int i = cbLayer.getSelectedIndex();
+						int j = mapView.getMousePosition().x;
+						int k = mapView.getMousePosition().y-15;
+						dataValue.setText("Value:" + (int)(data.get(i, k, j)) + " R");
+                    }
+                    catch (IOException iox)
+                    {
+
+                    }
+				}
+            }
+		});
+		
+		
+		
 		frame.setVisible(true);
 	}
 
