@@ -75,9 +75,6 @@ public class ssusiRender
 	/** The map "frame" */
 	private JLabel            mapView;
 
-	/** A label for the layer box. */
-	private JLabel            lbBox;
-
 	/** The color bar. */
 	private JLabel            cBar;
 
@@ -212,7 +209,6 @@ public class ssusiRender
 		right.add(btNext);
 		right.add(btSave);
 		right.add(btMltExecute);
-		right.add(lbBox);
 		right.add(cbLayer);
 		right.add(dataValue);
 		frame.add(right, BorderLayout.EAST);
@@ -461,8 +457,6 @@ public class ssusiRender
 			}
 		});
 
-		// this uses the same methods as the legal info
-		// to provide links to the SSUSI data downloads
 		data.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent dataInfo)
@@ -471,43 +465,8 @@ public class ssusiRender
 				aboutPane.setEditable(false);
 				aboutPane.setEditorKit(JEditorPane.createEditorKitForContentType("text/html"));
 				aboutPane.setText("<html><div align=center><p>Data from the SSUSI instruments on DMSP satellites f16 - "
-						+ "f18 is available from the <a href=http://ssusi.jhuapl.edu/data_retriver>SSUSI project website</a>."
-						+ "<br>For use with this program, please select the data type \"EDR-AUR\" for download.</p></html>");
-
-				aboutPane.addHyperlinkListener(new HyperlinkListener()
-				{
-					public void hyperlinkUpdate(HyperlinkEvent hyper)
-					{
-						if (hyper.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
-						{
-							if (Desktop.isDesktopSupported())
-							{
-								try
-								{
-									Desktop.getDesktop().browse(hyper.getURL().toURI());
-								}
-								catch (IOException ioX)
-								{
-									JOptionPane.showMessageDialog(new JFrame(),
-											"There was an IOException while processing your request.",
-											"IOException", JOptionPane.ERROR_MESSAGE);
-								}
-								catch (URISyntaxException synX)
-								{
-									JOptionPane.showMessageDialog(new JFrame(),
-											"There was a syntax error while processing your request.",
-											"Syntax Error", JOptionPane.ERROR_MESSAGE);
-								}
-							}
-							else
-							{
-								JOptionPane.showMessageDialog(new JFrame(),
-										"Unsupported system. Visit link directly at:" + hyper.getURL(),
-										"Unsupported System", JOptionPane.INFORMATION_MESSAGE);
-							}
-						}
-					}
-				});
+						+ "f18 is available from the CDAWEB FTP server</a>.<br>For use with this program, please select the"
+						+" data type \"EDR-AUR\" for download.<br>ftp://cdaweb.gsfc.nasa.gov/pub/data/dmsp/</p></html>");
 				JOptionPane.showMessageDialog(new JFrame(), aboutPane);
 			}
 		});
