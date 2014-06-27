@@ -62,6 +62,10 @@ public class ssusiRender
 
 	/** Button for execution of map rendering. */
 	private JButton           btExecute;
+	
+	/** Button to open zoomView. */
+	@SuppressWarnings("unused")
+    private JButton 		  btZoomview;
 
 	/** A combo box with layer numbers 0-4. */
 	private JComboBox<String> cbLayer;
@@ -150,7 +154,8 @@ public class ssusiRender
 		JButton      btNext       = new JButton("Next");
 		JButton      btBack       = new JButton("Back");
 		JButton      btSave       = new JButton("Save Image");
-		JButton      btMltExecute = new JButton("View Magnetic Map");
+		JButton      btMltExecute = new JButton("Magnetic Map");
+		JButton		 btZoomView   = new JButton("Zoom View");
 
 		// lists, boxes, and text
 		numOfNum         = new JLabel("<html> <br> <br> <br>");
@@ -198,18 +203,24 @@ public class ssusiRender
 
 		// right side GUI elements
 		JPanel right = new JPanel();
-		btSave.setPreferredSize(new Dimension(120, 50));
-		btNext.setPreferredSize(new Dimension(120, 50));
-		right.setLayout(new BoxLayout(right, BoxLayout.PAGE_AXIS));
+		right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
 		right.add(btExecute);
 		right.add(btBack);
 		right.add(btNext);
+		right.add(btZoomView);
 		right.add(btSave);
 		right.add(btMltExecute);
 		right.add(cbLayer);
 		right.add(dataValue);
 		frame.add(right, BorderLayout.EAST);
-
+		btExecute.setMaximumSize(new Dimension(145, 30));
+		btBack.setMaximumSize(new Dimension(145, 30));
+		btNext.setMaximumSize(new Dimension(145, 30));
+		btZoomView.setMaximumSize(new Dimension(145, 30));
+		btSave.setMaximumSize(new Dimension(145, 30));
+		btMltExecute.setMaximumSize(new Dimension(145, 30));
+		cbLayer.setMaximumSize(new Dimension(145, 30));
+		
 		// center GUI elements
 		JPanel center    = new JPanel();
 		JPanel cBarPanel = new JPanel();
@@ -598,6 +609,15 @@ public class ssusiRender
 				}
             }
 		});
+		
+		btZoomView.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				new zoomView(map);
+			}
+		});
+		
 		frame.setVisible(true);
 	}
 }

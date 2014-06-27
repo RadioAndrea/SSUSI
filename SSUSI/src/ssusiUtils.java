@@ -27,7 +27,8 @@ public class ssusiUtils
 		FileNameExtensionFilter png     = new FileNameExtensionFilter("GIF Image File", "gif");
 		chSaver.setApproveButtonText("Save");
 		chSaver.setFileFilter(png);
-		int                     returns = chSaver.showOpenDialog(null);
+		
+		int returns = chSaver.showOpenDialog(null);
 
 		if (returns == JFileChooser.APPROVE_OPTION)
 		{
@@ -76,9 +77,9 @@ public class ssusiUtils
 	 */
 	public static ArrayList<File> sortTime(ArrayList<File> directory)
 	{
-		int        a    = 0;
-		NetcdfFile file = null;
-		ArrayList<Integer> nums = new ArrayList<Integer>();
+		int 				a		= 0;
+		NetcdfFile 			file 	= null;
+		ArrayList<Integer> 	nums 	= new ArrayList<Integer>();
 		for (a = 0; a < directory.size() - 1; a++);
 		{
 			// sanitize directory of unreadable files
@@ -96,9 +97,9 @@ public class ssusiUtils
 		{
 			try
 			{
-				file             = NetcdfFile.open(directory.get(a).getPath());
-				int      dayInt  = file.findVariable("DOY").read().getInt(0);
-				int      timeInt = (int) (file.findVariable("TIME").read().getDouble(0) + dayInt * 86400);
+				file 		= NetcdfFile.open(directory.get(a).getPath());
+				int dayInt  = file.findVariable("DOY").read().getInt(0);
+				int timeInt = (int) (file.findVariable("TIME").read().getDouble(0) + dayInt * 86400);
 				nums.add(a, timeInt);
 			}
 			catch (IOException e)
@@ -140,9 +141,9 @@ public class ssusiUtils
 					tempInt  = nums.get(a);
 
 					files.set(a, files.get(a + gap));
-					nums.set(a, nums.get(a + gap));
+					nums .set(a, nums .get(a + gap));
 					files.set(a + gap, tempFile);
-					nums.set(a + gap, tempInt);
+					nums .set(a + gap, tempInt);
 
 					didSort  = true;
 				}
