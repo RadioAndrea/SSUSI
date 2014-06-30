@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,8 +29,11 @@ public class zoomView
 	
 	BufferedImage liveMap = new BufferedImage(363, 363, BufferedImage.TYPE_INT_RGB);
 	
-	public zoomView(BufferedImage map)
+	List<List<Float>> data = new ArrayList<List<Float>>();
+	
+	public zoomView(BufferedImage map, List<List<Float>> listsList)
 	{
+		data = listsList;
 		Graphics2D gfxOriginal = originalMap.createGraphics();
 		gfxOriginal.drawImage(map, 0, 0, null);
 		gfxOriginal.dispose();
@@ -96,12 +101,49 @@ public class zoomView
 					if(yValueTL + originalMap.getHeight() > tempMap.getHeight())
 						yValueTL = tempMap.getHeight() - originalMap.getHeight();
 				}
+				data = cropList(xValueTL, yValueTL, data);
+				
 				Graphics2D gfxLive = liveMap.createGraphics();
 				gfxLive.drawImage(tempMap.getSubimage(xValueTL, yValueTL, liveMap.getWidth(), liveMap.getHeight()), 0, 0, liveMap.getWidth(), liveMap.getHeight(), null);
 				gfxLive.dispose();
-				//liveMap = tempMap.getSubimage(xValueTL, yValueTL, liveMap.getWidth(), liveMap.getHeight());
 				mapView.setIcon(new ImageIcon(liveMap));
 			}
 		});
 	}
+	 public List<List<Float>> cropList(int xval, int yval, List<List<Float>> listOfLists)
+	 {
+		double xper = (xval/(1.1*363))*100;
+		double yper = (yval/(1.1*363))*100;
+		
+		int xvalListLeft = (int) (listOfLists.get(0).size()*xper);
+		int yvalListLeft = (int) (listOfLists.size()*yper);
+		
+		int xvalListRight = (int) (xvalListLeft*listOfLists.get(0).size()*0.9);
+		int yvalListRight = (int) (yvalListLeft*listOfLists.size()*0.9);
+		
+		//deletes the bits at the beginning that we don't want
+		for(int a = 0; a < yvalListLeft; a++)
+		{
+			listOfLists.remove(0);
+		}
+		for(int a = 0; a < listOfLists.size(); a++)
+		{
+			for(int b = 0; b < xvalListLeft; b++)
+			{
+				listOfLists.get(a).remove(0);
+			}
+		}
+		
+		//deletes the bits at the end
+		while(yvalListRight < listOfLists.size()-1)
+			listOfLists.remove(yvalListRight+1);
+		
+		for(int a = 0; a < listOfLists.size(); a++)
+		{
+			while(xvalListRight < listOfLists.get(a).size()-1)
+				listOfLists.remove(xvalListRight+1);
+		}
+		 
+		return listOfLists;
+	 }
 }

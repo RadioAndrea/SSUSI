@@ -13,7 +13,6 @@ import ucar.nc2.NetcdfFile;
 
 public class ssusiUtils
 {
-
 	/**
 	 * Displays a dialogue to save an image, then saves the image (or doesn't
 	 * based on user input).

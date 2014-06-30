@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -64,7 +65,7 @@ public class ssusiRender
 	private JButton           btExecute;
 	
 	/** Button to open zoomView. */
-	@SuppressWarnings("unused")
+    @SuppressWarnings("unused")
     private JButton 		  btZoomview;
 
 	/** A combo box with layer numbers 0-4. */
@@ -267,8 +268,8 @@ public class ssusiRender
 						{
 							JOptionPane.showMessageDialog(new JFrame(),
 									"The specified directory is either empty, "
-											+ "or contains no netCDF files", "Directory Empty",
-											JOptionPane.ERROR_MESSAGE);
+									+ "or contains no netCDF files", "Directory Empty",
+									JOptionPane.ERROR_MESSAGE);
 							btChooseFile.doClick();
 						}
 						// tell us where we are
@@ -610,11 +611,27 @@ public class ssusiRender
             }
 		});
 		
-		btZoomView.addActionListener(new ActionListener()
+		btZoomView.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				new zoomView(map);
+				try
+				{
+					NetcdfFile        file      = NetcdfFile.open(current.getPath());
+					ArrayFloat.D3     data      = (ArrayFloat.D3) file.findVariable((String) cbVariable.getSelectedItem()).read();
+					List<List<Float>> listsList = new ArrayList<List<Float>>();
+					for(int a = 0; a < data.getShape()[1]; a++)
+					{
+						listsList.add(new ArrayList<Float>());
+						for(int b = 0; b < data.getShape()[2]; b ++)
+						{
+							listsList.get(a).add(data.get(cbLayer.getSelectedIndex(), a, b));
+						}
+					}
+					new zoomView(map, listsList);
+				}
+				catch(Exception iox)
+				{}
 			}
 		});
 		
