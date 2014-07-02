@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -615,11 +614,15 @@ public class ssusiRender
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				try
-				{
-					NetcdfFile        file      = NetcdfFile.open(current.getPath());
+					NetcdfFile file;
+                    try
+                    {
+	                   file = NetcdfFile.open(current.getPath());
+					System.out.println("1");
 					ArrayFloat.D3     data      = (ArrayFloat.D3) file.findVariable((String) cbVariable.getSelectedItem()).read();
-					List<List<Float>> listsList = new ArrayList<List<Float>>();
+					System.out.println("2");
+					ArrayList<ArrayList<Float>> listsList = new ArrayList<ArrayList<Float>>();
+					System.out.println("3");
 					for(int a = 0; a < data.getShape()[1]; a++)
 					{
 						listsList.add(new ArrayList<Float>());
@@ -628,10 +631,15 @@ public class ssusiRender
 							listsList.get(a).add(data.get(cbLayer.getSelectedIndex(), a, b));
 						}
 					}
-					new zoomView(map, listsList);
-				}
-				catch(Exception iox)
-				{}
+					arrayList2d<Float> list = new arrayList2d<Float>();
+					list.stackedListTo2dArrayList(listsList);
+					new zoomView(list);
+                    }
+                    catch (IOException e1)
+                    {
+	                    // TODO Auto-generated catch block
+	                    e1.printStackTrace();
+                    }
 			}
 		});
 		
