@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,19 +27,24 @@ public class zoomView
 
 	BufferedImage liveMap;
 
-	arrayList2d<Float> data = new arrayList2d<Float>();
+	arrayList2d<Float> data         = new arrayList2d<Float>();
 
-	List<List<Float>> originalData = new ArrayList<List<Float>>();
+	List<List<Float>>  originalData = new ArrayList<List<Float>>();
 
 	int bucketSize;
 
-	public zoomView(arrayList2d<Float> dataIn) throws IOException
+	public zoomView(arrayList2d<Float> dataIn)
 	{
-		data = dataIn;
+		if(dataIn == null)
+		{
+			dataIn = new arrayList2d<Float>();
+			dataIn.add((float) 0, 0);
+		}
+		data    = dataIn;
 		liveMap = arrayToImage(data);
-				
-		frame       = new JFrame();
-		panel       = new JPanel();
+			
+		frame   = new JFrame();
+		panel   = new JPanel();
 
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setTitle("Zoom View");
@@ -73,6 +77,7 @@ public class zoomView
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
+				System.out.println(mapView.getMousePosition());
 				Graphics2D gfx = liveMap.createGraphics();
 				gfx.drawImage(arrayToImage(cropArray(data, 0.40, mapView.getMousePosition().getX(), mapView.getMousePosition().getY())), 0, 0, null);
 				gfx.dispose();
@@ -95,7 +100,12 @@ public class zoomView
 			for(int b = 0; b < y; b++)
 				for(int c = 1; c <= bucket; c++)
 					for(int d = 1; d <= bucket; d++)
+					{
+						if (array2d.get(a, b) == 0)
+							image.setRGB((b*bucket)+(c-1), (a*bucket)+(d-1), 3289650);
+						else
 						image.setRGB((b*bucket)+(c-1), (a*bucket)+(d-1), ssusiUtils.getColorFromValue((int)((float) array2d.get(a, b)), 5));
+					}
 
 		return image;
 	}
@@ -107,17 +117,18 @@ public class zoomView
 		while(363%(array2d.getHeight()-linesToRemove)!=0)
 			linesToRemove++;
 		
-		int side = array2d.getHeight()-linesToRemove-1;
-		int halfSide = side/2;
-		
-		double scale = 363/array2d.getHeight();
+		int    side     = array2d.getHeight()-linesToRemove;
+		int    halfSide = side/2;
+	
+		double scale    = 363/array2d.getHeight();
 		
 		//upperlefty, upperleftx, bottomrighty, bottomrightx
 		//respectively
 		int uly = (int) (mousey/scale - halfSide);
 		int ulx = (int) (mousex/scale - halfSide);
-		int bry = (int) (mousey/scale + halfSide);
-		int brx = (int) (mousex/scale + halfSide);
+		int bry = uly + side;
+		int brx = ulx + side;
+		
 		
 		if(uly < 0)
 		{
@@ -140,11 +151,15 @@ public class zoomView
 			ulx = brx - side;
 		}
 		
+		System.out.println("Top Left Corner: " + ulx + "," + uly);
+		System.out.println("Bottom Right Corner: " + brx + "," + bry);
+		System.out.println("Array Dimensions: " + array2d.getWidth() + "," + array2d.getHeight());
+		
 		while(uly-- > 0)
 		{
 			array2d.removeRow(0);
 		}
-		while(bry < array2d.getHeight()-1)
+		while(side < array2d.getHeight())
 		{
 			array2d.removeRow(array2d.getHeight()-1);
 		}
@@ -152,11 +167,12 @@ public class zoomView
 		{
 			array2d.removeColumn(0);
 		}
-		while(brx < array2d.getWidth()-1)
+		while(side < array2d.getWidth())
 		{
 			array2d.removeColumn(array2d.getWidth()-1);
 		}
-		
+		System.out.println("---------------------------------");
+		System.out.println("Array Dimensions: " + array2d.getWidth() + "," + array2d.getHeight());
 		return array2d;
 	}
 

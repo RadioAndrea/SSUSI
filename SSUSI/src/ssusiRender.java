@@ -614,32 +614,35 @@ public class ssusiRender
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-					NetcdfFile file;
-                    try
-                    {
-	                   file = NetcdfFile.open(current.getPath());
-					System.out.println("1");
-					ArrayFloat.D3     data      = (ArrayFloat.D3) file.findVariable((String) cbVariable.getSelectedItem()).read();
-					System.out.println("2");
-					ArrayList<ArrayList<Float>> listsList = new ArrayList<ArrayList<Float>>();
-					System.out.println("3");
-					for(int a = 0; a < data.getShape()[1]; a++)
+				NetcdfFile file;
+				try
+				{
+					if(current != null)
 					{
-						listsList.add(new ArrayList<Float>());
-						for(int b = 0; b < data.getShape()[2]; b ++)
+						file                                  = NetcdfFile.open(current.getPath());
+						ArrayFloat.D3               data      = (ArrayFloat.D3) file.findVariable((String) cbVariable.getSelectedItem()).read();
+						ArrayList<ArrayList<Float>> listsList = new ArrayList<ArrayList<Float>>();
+						arrayList2d<Float>          list      = new arrayList2d<Float>();
+
+						for(int a = 0; a < data.getShape()[1]; a++)
 						{
-							listsList.get(a).add(data.get(cbLayer.getSelectedIndex(), a, b));
+							listsList.add(new ArrayList<Float>());
+							for(int b = 0; b < data.getShape()[2]; b ++)
+							{
+								listsList.get(a).add(data.get(cbLayer.getSelectedIndex(), a, b));
+							}
 						}
+
+						list.stackedListTo2dArrayList(listsList);
+						new zoomView(list);
 					}
-					arrayList2d<Float> list = new arrayList2d<Float>();
-					list.stackedListTo2dArrayList(listsList);
-					new zoomView(list);
-                    }
-                    catch (IOException e1)
-                    {
-	                    // TODO Auto-generated catch block
-	                    e1.printStackTrace();
-                    }
+					else
+						new zoomView(null);
+				}
+				catch (IOException IOX)
+				{
+					IOX.printStackTrace();
+				}
 			}
 		});
 		
