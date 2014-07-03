@@ -1,13 +1,13 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,132 +18,178 @@ import javax.swing.JPanel;
 public class zoomView
 {
 	JFrame frame;
-	
+
 	JPanel panel;
-	
+
 	JLabel mapView;
-	
+
 	JButton btReturn;
-	
-	BufferedImage originalMap = new BufferedImage(363, 363, BufferedImage.TYPE_INT_RGB);
-	
-	BufferedImage liveMap = new BufferedImage(363, 363, BufferedImage.TYPE_INT_RGB);
-	
-	List<List<Float>> data = new ArrayList<List<Float>>();
-	
-	public zoomView(BufferedImage map, List<List<Float>> listsList)
+
+	BufferedImage liveMap;
+
+	arrayList2d<Float> data;
+
+	arrayList2d<Float>  originalData;
+
+	int bucketSize;
+
+	public zoomView(arrayList2d<Float> dataIn)
 	{
-		data = listsList;
-		Graphics2D gfxOriginal = originalMap.createGraphics();
-		gfxOriginal.drawImage(map, 0, 0, null);
-		gfxOriginal.dispose();
+		if(dataIn == null)
+		{
+			dataIn = new arrayList2d<Float>();
+			dataIn.add((float) 0, 0);
+		}
+		data = new arrayList2d<Float>(dataIn);
+		originalData = new arrayList2d<Float>(dataIn);
 		
-		Graphics2D gfxLiveMap = liveMap.createGraphics();
-		gfxLiveMap.drawImage(map, 0, 0, null);
-		gfxLiveMap.dispose();
-		
-		frame       = new JFrame();
-		panel       = new JPanel();
-		
+		liveMap = arrayToImage(data);
+			
+		frame   = new JFrame();
+		panel   = new JPanel();
+
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setTitle("Zoom View");
 		frame.setResizable(false);
 		frame.setLocationRelativeTo(null);
 		frame.setSize(363, 415);
 		frame.add(panel);
-		
+
 		panel.setLayout(new BorderLayout());
 		mapView  = new JLabel(new ImageIcon(liveMap));
 		mapView.setMaximumSize(new Dimension(363, 363));
 		btReturn = new JButton("Return to Full Size");
-		
+
 		panel.add(mapView, BorderLayout.CENTER);
 		panel.add(btReturn, BorderLayout.SOUTH);
-		
+
 		frame.setVisible(true);
-		
+
 		btReturn.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				Graphics2D gfxLive = liveMap.createGraphics();
-				gfxLive.drawImage(originalMap, 0, 0, originalMap.getWidth(), originalMap.getHeight(), null);
-				gfxLive.dispose();
-				mapView.setIcon(new ImageIcon(liveMap));
+				data = new arrayList2d<Float>(originalData);
+				Graphics2D gfx = liveMap.createGraphics();
+				gfx.drawImage(arrayToImage(data), 0, 0, null);
+				gfx.dispose();
+				mapView.repaint();
 			}
 		});
-		
+
 		mapView.addMouseListener(new MouseAdapter()
 		{
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				BufferedImage tempMap = new BufferedImage((int)(liveMap.getWidth()*1.1), (int)(liveMap.getHeight()*1.1), BufferedImage.TYPE_INT_RGB);
-				Graphics2D gfxTempImage = tempMap.createGraphics();
-				gfxTempImage.drawImage(liveMap, 0, 0, (int)(liveMap.getWidth()*1.1), (int)(liveMap.getHeight()*1.1), null);
-				gfxTempImage.dispose();
-				int xValueTL = (int) (mapView.getMousePosition().getX()-(originalMap.getWidth()/2+1));
-				int yValueTL = (int) (mapView.getMousePosition().getY()-(originalMap.getHeight()/2+1));
-				
-				
-				//fix the top left corner
-				if(xValueTL < 0)
-					xValueTL = 0;
-				if(yValueTL < 0)
-					yValueTL = 0;
-				//if the top left corner is inside the image
-				if(xValueTL >= 0 && yValueTL >= 0)
+				if(e.getModifiers() == InputEvent.BUTTON1_MASK)
 				{
-					//and if the bottom right corner is outside the image
-					if(xValueTL + originalMap.getWidth() > tempMap.getWidth())
-						xValueTL = tempMap.getWidth() - originalMap.getWidth();
-					if(yValueTL + originalMap.getHeight() > tempMap.getHeight())
-						yValueTL = tempMap.getHeight() - originalMap.getHeight();
+					Graphics2D gfx = liveMap.createGraphics();
+					gfx.drawImage(arrayToImage(cropArray(data, 0.40, mapView.getMousePosition().getX(), mapView.getMousePosition().getY())), 0, 0, null);
+					gfx.dispose();
+					mapView.repaint();
 				}
-				data = cropList(xValueTL, yValueTL, data);
-				
-				Graphics2D gfxLive = liveMap.createGraphics();
-				gfxLive.drawImage(tempMap.getSubimage(xValueTL, yValueTL, liveMap.getWidth(), liveMap.getHeight()), 0, 0, liveMap.getWidth(), liveMap.getHeight(), null);
-				gfxLive.dispose();
-				mapView.setIcon(new ImageIcon(liveMap));
+				else
+				{
+					frame.setTitle(getValueAtPoint(mapView.getMousePosition(), data) + " Rayleighs at point " 
+							+ mapView.getMousePosition().getX() + "," + mapView.getMousePosition().getY());
+				}
 			}
 		});
 	}
-	 public List<List<Float>> cropList(int xval, int yval, List<List<Float>> listOfLists)
-	 {
-		double xper = (xval/(1.1*363))*100;
-		double yper = (yval/(1.1*363))*100;
+
+	private BufferedImage arrayToImage(arrayList2d<Float> array2d)
+	{
+		BufferedImage image = new BufferedImage(363, 363, BufferedImage.TYPE_INT_RGB);
 		
-		int xvalListLeft = (int) (listOfLists.get(0).size()*xper);
-		int yvalListLeft = (int) (listOfLists.size()*yper);
+		int y = array2d.getHeight();
 		
-		int xvalListRight = (int) (xvalListLeft*listOfLists.get(0).size()*0.9);
-		int yvalListRight = (int) (yvalListLeft*listOfLists.size()*0.9);
+		while(image.getHeight()%y!=0)
+			y--;
 		
-		//deletes the bits at the beginning that we don't want
-		for(int a = 0; a < yvalListLeft; a++)
+		int bucket = image.getHeight()/y;
+		for(int a = 0; a < y; a++)
+			for(int b = 0; b < y; b++)
+				for(int c = 1; c <= bucket; c++)
+					for(int d = 1; d <= bucket; d++)
+					{
+						if (array2d.get(a, b) == 0)
+							image.setRGB((b*bucket)+(c-1), (a*bucket)+(d-1), 3289650);
+						else
+						image.setRGB((b*bucket)+(c-1), (a*bucket)+(d-1), ssusiUtils.getColorFromValue((int)((float) array2d.get(a, b)), 5));
+					}
+
+		return image;
+	}
+	
+	private arrayList2d<Float> cropArray(arrayList2d<Float> array2d, double factor, double mousex, double mousey)
+	{
+		
+		int linesToRemove = (int) (array2d.getHeight()*factor);
+		while(363%(array2d.getHeight()-linesToRemove)!=0)
+			linesToRemove++;
+		
+		int    side     = array2d.getHeight()-linesToRemove;
+		int    halfSide = side/2;
+	
+		double scale    = 363/array2d.getHeight();
+		
+		//upperlefty, upperleftx, bottomrighty, bottomrightx
+		//respectively
+		int uly = (int) (mousey/scale - halfSide);
+		int ulx = (int) (mousex/scale - halfSide);
+		int bry = uly + side;
+		int brx = ulx + side;
+		
+		
+		if(uly < 0)
 		{
-			listOfLists.remove(0);
+			uly = 0;
+			bry = side;
 		}
-		for(int a = 0; a < listOfLists.size(); a++)
+		if(ulx < 0)
 		{
-			for(int b = 0; b < xvalListLeft; b++)
-			{
-				listOfLists.get(a).remove(0);
-			}
+			ulx = 0;
+			brx = side;
+		}
+		if(bry >= array2d.getHeight())
+		{
+			bry = array2d.getHeight()-1;
+			uly = bry-side;
+		}
+		if(brx >= array2d.getWidth())
+		{
+			brx = array2d.getWidth()-1;
+			ulx = brx - side;
 		}
 		
-		//deletes the bits at the end
-		while(yvalListRight < listOfLists.size()-1)
-			listOfLists.remove(yvalListRight+1);
-		
-		for(int a = 0; a < listOfLists.size(); a++)
+		while(uly-- > 0)
 		{
-			while(xvalListRight < listOfLists.get(a).size()-1)
-				listOfLists.remove(xvalListRight+1);
+			array2d.removeRow(0);
 		}
-		 
-		return listOfLists;
-	 }
+		while(side < array2d.getHeight())
+		{
+			array2d.removeRow(array2d.getHeight()-1);
+		}
+		while(ulx-- > 0)
+		{
+			array2d.removeColumn(0);
+		}
+		while(side < array2d.getWidth())
+		{
+			array2d.removeColumn(array2d.getWidth()-1);
+		}
+
+		return array2d;
+	}
+	
+	private float getValueAtPoint(Point point, arrayList2d<Float> array2d)
+	{
+		int ratio = 363/array2d.getHeight();
+		int x = (int) point.getX()/ratio;
+		int y = (int) point.getY()/ratio;
+		
+		return (float) array2d.get(y, x);
+	}
 }

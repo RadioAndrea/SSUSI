@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -615,23 +614,35 @@ public class ssusiRender
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				NetcdfFile file;
 				try
 				{
-					NetcdfFile        file      = NetcdfFile.open(current.getPath());
-					ArrayFloat.D3     data      = (ArrayFloat.D3) file.findVariable((String) cbVariable.getSelectedItem()).read();
-					List<List<Float>> listsList = new ArrayList<List<Float>>();
-					for(int a = 0; a < data.getShape()[1]; a++)
+					if(current != null)
 					{
-						listsList.add(new ArrayList<Float>());
-						for(int b = 0; b < data.getShape()[2]; b ++)
+						file                                  = NetcdfFile.open(current.getPath());
+						ArrayFloat.D3               data      = (ArrayFloat.D3) file.findVariable((String) cbVariable.getSelectedItem()).read();
+						ArrayList<ArrayList<Float>> listsList = new ArrayList<ArrayList<Float>>();
+						arrayList2d<Float>          list      = new arrayList2d<Float>();
+
+						for(int a = 0; a < data.getShape()[1]; a++)
 						{
-							listsList.get(a).add(data.get(cbLayer.getSelectedIndex(), a, b));
+							listsList.add(new ArrayList<Float>());
+							for(int b = 0; b < data.getShape()[2]; b ++)
+							{
+								listsList.get(a).add(data.get(cbLayer.getSelectedIndex(), a, b));
+							}
 						}
+
+						list.stackedListTo2dArrayList(listsList);
+						new zoomView(list);
 					}
-					new zoomView(map, listsList);
+					else
+						new zoomView(null);
 				}
-				catch(Exception iox)
-				{}
+				catch (IOException IOX)
+				{
+					IOX.printStackTrace();
+				}
 			}
 		});
 		
