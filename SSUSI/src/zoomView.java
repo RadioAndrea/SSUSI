@@ -1,13 +1,13 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -27,9 +27,9 @@ public class zoomView
 
 	BufferedImage liveMap;
 
-	arrayList2d<Float> data         = new arrayList2d<Float>();
+	arrayList2d<Float> data;
 
-	List<List<Float>>  originalData = new ArrayList<List<Float>>();
+	arrayList2d<Float>  originalData;
 
 	int bucketSize;
 
@@ -40,7 +40,9 @@ public class zoomView
 			dataIn = new arrayList2d<Float>();
 			dataIn.add((float) 0, 0);
 		}
-		data    = dataIn;
+		data = new arrayList2d<Float>(dataIn);
+		originalData = new arrayList2d<Float>(dataIn);
+		
 		liveMap = arrayToImage(data);
 			
 		frame   = new JFrame();
@@ -68,7 +70,11 @@ public class zoomView
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-
+				data = new arrayList2d<Float>(originalData);
+				Graphics2D gfx = liveMap.createGraphics();
+				gfx.drawImage(arrayToImage(data), 0, 0, null);
+				gfx.dispose();
+				mapView.repaint();
 			}
 		});
 
@@ -77,11 +83,18 @@ public class zoomView
 			@Override
 			public void mouseClicked(MouseEvent e)
 			{
-				System.out.println(mapView.getMousePosition());
-				Graphics2D gfx = liveMap.createGraphics();
-				gfx.drawImage(arrayToImage(cropArray(data, 0.40, mapView.getMousePosition().getX(), mapView.getMousePosition().getY())), 0, 0, null);
-				gfx.dispose();
-				mapView.repaint();
+				if(e.getModifiers() == InputEvent.BUTTON1_MASK)
+				{
+					Graphics2D gfx = liveMap.createGraphics();
+					gfx.drawImage(arrayToImage(cropArray(data, 0.40, mapView.getMousePosition().getX(), mapView.getMousePosition().getY())), 0, 0, null);
+					gfx.dispose();
+					mapView.repaint();
+				}
+				else
+				{
+					frame.setTitle(getValueAtPoint(mapView.getMousePosition(), data) + " Rayleighs at point " 
+							+ mapView.getMousePosition().getX() + "," + mapView.getMousePosition().getY());
+				}
 			}
 		});
 	}
@@ -151,10 +164,6 @@ public class zoomView
 			ulx = brx - side;
 		}
 		
-		System.out.println("Top Left Corner: " + ulx + "," + uly);
-		System.out.println("Bottom Right Corner: " + brx + "," + bry);
-		System.out.println("Array Dimensions: " + array2d.getWidth() + "," + array2d.getHeight());
-		
 		while(uly-- > 0)
 		{
 			array2d.removeRow(0);
@@ -171,9 +180,16 @@ public class zoomView
 		{
 			array2d.removeColumn(array2d.getWidth()-1);
 		}
-		System.out.println("---------------------------------");
-		System.out.println("Array Dimensions: " + array2d.getWidth() + "," + array2d.getHeight());
+
 		return array2d;
 	}
-
+	
+	private float getValueAtPoint(Point point, arrayList2d<Float> array2d)
+	{
+		int ratio = 363/array2d.getHeight();
+		int x = (int) point.getX()/ratio;
+		int y = (int) point.getY()/ratio;
+		
+		return (float) array2d.get(y, x);
+	}
 }

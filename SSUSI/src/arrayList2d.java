@@ -9,6 +9,13 @@ public class arrayList2d<T>
 	public arrayList2d()
 	{}
 	
+	public arrayList2d(arrayList2d<T> list)
+	{
+		for(int a = 0; a < list.getHeight(); a++)
+			for(int b = 0; b < list.getWidth(); b++)
+				add(list.get(a, b), a);
+	}
+	
 	public int getHeight()
 	{
 		return mainList.size();
