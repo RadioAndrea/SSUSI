@@ -1,3 +1,5 @@
+package ssusiDataRendering;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -73,7 +75,7 @@ public class ssusiRender
 	/** A combo box with the south and north pole data names. */
 	private JComboBox<String> cbVariable;
 
-	/** The map "frame" */
+	/**  The map "frame". */
 	private JLabel            mapView;
 
 	/** The color bar. */
@@ -85,7 +87,7 @@ public class ssusiRender
 	/** The upper label for the color bar. */
 	private JLabel            cBarHigh; 
 	
-	/** A label to show the data value of the current pixel */
+	/**  A label to show the data value of the current pixel. */
 	private JLabel			  dataValue;
 
 	/** The bucket size. */
@@ -94,13 +96,13 @@ public class ssusiRender
 	/** The directory name in a text field. */
 	private TextField         fileName;
 
-	/** List of files in the directory*/
+	/**  List of files in the directory. */
 	private ArrayList<File>   directory;
 
-	/** menu item to set the window as resizable*/
+	/**  menu item to set the window as resizable. */
 	private JCheckBoxMenuItem resizable;
 
-	/** The map image itself */
+	/**  The map image itself. */
 	private BufferedImage     map;
 	
 
@@ -425,6 +427,10 @@ public class ssusiRender
 
 				aboutPane.addHyperlinkListener(new HyperlinkListener()
 				{
+					
+					/* (non-Javadoc)
+					 * @see javax.swing.event.HyperlinkListener#hyperlinkUpdate(javax.swing.event.HyperlinkEvent)
+					 */
 					public void hyperlinkUpdate(HyperlinkEvent hyper)
 					{
 						if (hyper.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
@@ -612,6 +618,8 @@ public class ssusiRender
 		
 		btZoomView.addActionListener(new ActionListener() 
 		{
+			
+			
 			public void actionPerformed(ActionEvent e)
 			{
 				NetcdfFile file;
