@@ -1,3 +1,5 @@
+package ssusiDataRendering;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -15,24 +17,41 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * The Class zoomView.
+ */
 public class zoomView
 {
+	
+	/** The main frame. */
 	JFrame frame;
 
+	/** The main panel for the frame. */
 	JPanel panel;
 
+	/** Label that contains the map. */
 	JLabel mapView;
 
+	/** Button that lets user return image to default state. */
 	JButton btReturn;
 
+	/** The map itself. */
 	BufferedImage liveMap;
 
+	/** The live data list. */
 	arrayList2d<Float> data;
 
+	/** The original data, to restore the live data list. */
 	arrayList2d<Float>  originalData;
 
+	/** The bucket size. */
 	int bucketSize;
 
+	/**
+	 * Instantiates a new zoom GUI.
+	 *
+	 * @param dataIn A 2d array list of values
+	 */
 	public zoomView(arrayList2d<Float> dataIn)
 	{
 		if(dataIn == null)
@@ -99,6 +118,12 @@ public class zoomView
 		});
 	}
 
+	/**
+	 * Converts a 2d array list of values into a colored buffered image
+	 *
+	 * @param array2d Data to be processed
+	 * @return BufferedImage representation of array2d
+	 */
 	private BufferedImage arrayToImage(arrayList2d<Float> array2d)
 	{
 		BufferedImage image = new BufferedImage(363, 363, BufferedImage.TYPE_INT_RGB);
@@ -123,9 +148,20 @@ public class zoomView
 		return image;
 	}
 	
+	/**
+	 * Crops an array.
+	 *
+	 * @param array2d 2d array list to be cropped
+	 * @param factor a decimal factor to crop by (<1)
+	 * @param mousex the mouse x location
+	 * @param mousey the mouse y location
+	 * @return a cropped version of array2d
+	 */
 	private arrayList2d<Float> cropArray(arrayList2d<Float> array2d, double factor, double mousex, double mousey)
 	{
 		
+		while(factor>1)
+			factor /= 10;
 		int linesToRemove = (int) (array2d.getHeight()*factor);
 		while(363%(array2d.getHeight()-linesToRemove)!=0)
 			linesToRemove++;
@@ -184,6 +220,13 @@ public class zoomView
 		return array2d;
 	}
 	
+	/**
+	 * Gets the value at a point.
+	 *
+	 * @param point Point to examine
+	 * @param array2d 2d array list to examine
+	 * @return the value at point
+	 */
 	private float getValueAtPoint(Point point, arrayList2d<Float> array2d)
 	{
 		int ratio = 363/array2d.getHeight();
