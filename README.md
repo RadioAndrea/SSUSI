@@ -7,12 +7,17 @@ SSUSI Auroral Area Map Rendering
 
 Building:
 ----------------
-This project can be built with most java compilers. The pre-compiled JAR files are compiled with Java 1.8, however the code is compatible with Java 1.7. No earlier versions have been tested.
-This program creates renderings of the auroral information from the SSUSI instrument on DMSP f16 - f18 based on the data released in the netCDF format. 
+This project inclues a pre-built JAR file. It can be used on most systems with a Java virtual machine installed (available here: https://www.java.com/en/download/) simply by double clicking on the file in your file browser, or by invoking Java from the commandline in the form "java render.jar". This is the reccomended method for using this project.
+
+While not reccomended, this project can be built from source with most java compilers. The pre-compiled JAR files are tested with Java 1.8 and Java 1.7. No earlier versions have been tested. On a properly configured machine open the location of the downloaded source, then run the command "javac <filename>" for each of the "*.java" files inside the package. Then run "java ssusiRender". Compiling from a source-code version different from the current release version may create an executible with errors and bugs!
 
 Usage:
 ----------------
-From the program window, select the directory with the data of interest, then press the "Generate Maps" button. The individual files can then be browsed with the "Next" and "Back" buttons. 
+CDF files from the SSUSI project page should be placed in a directory without any other types of files.
+
+From the program window, use the "Choose Directory" button to select the directory with the data of interest, then press the "Generate Maps" button. The individual files can then be browsed with the "Next" and "Back" buttons. 
+
+A single left-click in the map area will give information about the clicked point.
 
 Interesting images can be exported in PNG format via the "Save Image" button. 
 
@@ -22,7 +27,11 @@ The top drop-down box under the button labeled "Choose Directory" is used to sel
 
 The "Magnetic Map" button displays a visualization of a 24 hour magnetic clock, with the border between the colors grey and green being magnetic midnight, and the other colors in the direction of the green wedge increasing in increments of 3 hours. That is to say, the border between green and grey is 0, and each traversal over a wedge adds or subtracts 3 hours.
 
+Fine details can be examined through use of the "Zoom View" button. This will open a small window with a duplicate map. A left-click on the map will zoom in at the point clicked. A right-click will display information about a point in the title bar of the window. The button at the bottom of the page allows the map to be reset to it's original size. There is no loss of fidelity by zooming; each zoomed view is a new image calculated directly from the data.
+
 In the settings menu, the size of each color's bucket can be changed. This "bucket" is the number of values that a single RGB value will represent. A smaller bucket size will allow greater fidelity in the conversion from numerical representation to visual color representation.
+
+The ability to resize the window is disabled by default. If it is neccessary for the window to be resized, there is a menu item to do so. This is not reccomended, and will cause the left-mouse click information to be incorrect. Do not change this setting, or resize the window unless you have a very good reason.
 
 Bugs and Feature Requests:
 ----------------
