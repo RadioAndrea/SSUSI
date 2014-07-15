@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
@@ -99,9 +98,6 @@ public class ssusiRender
 	/**  List of files in the directory. */
 	private ArrayList<File>   directory;
 
-	/**  menu item to set the window as resizable. */
-	private JCheckBoxMenuItem resizable;
-
 	/**  The map image itself. */
 	private BufferedImage     map;
 	
@@ -142,7 +138,7 @@ public class ssusiRender
 
 		// GUI elements
 		// assistance vars
-		String[] numbers   = new String[] { "1216", "1304", "1356", "LBHS", "LBHL" };
+		String[] numbers   = new String[] { "121.6 nm", "130.4 nm", "135.6 nm", "LBHS", "LBHL" };
 		String[] variables = new String[] { "DISK_RADIANCEDATA_INTENSITY_SOUTH",
 		"DISK_RADIANCEDATA_INTENSITY_NORTH" };
 
@@ -182,14 +178,12 @@ public class ssusiRender
 		JMenuItem legal     = new JMenuItem("Legal Info");
 		JMenuItem data      = new JMenuItem("SSUSI Data Download");
 		JMenuItem bucketSet = new JMenuItem("Change Bucket Size");
-		resizable           = new JCheckBoxMenuItem("Resizable Window");
 
 		frame.setJMenuBar(menuBar);
 		menuBar.add(about);
 		menuBar.add(settings);
 		about.add(legal);
 		about.add(data);
-		settings.add(resizable);
 		settings.add(bucketSet);
 
 		// Upper portion GUI elements
@@ -478,14 +472,6 @@ public class ssusiRender
 						+ "f18 is available from the CDAWEB FTP server</a>.<br>For use with this program, please select the"
 						+" data type \"EDR-AUR\" for download.<br>ftp://cdaweb.gsfc.nasa.gov/pub/data/dmsp/</p></html>");
 				JOptionPane.showMessageDialog(new JFrame(), aboutPane);
-			}
-		});
-
-		resizable.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent canResize)
-			{
-				frame.setResizable(resizable.getState());
 			}
 		});
 
