@@ -31,11 +31,9 @@ Fine details can be examined through use of the "Zoom View" button. This will op
 
 In the settings menu, the size of each color's bucket can be changed. This "bucket" is the number of values that a single RGB value will represent. A smaller bucket size will allow greater fidelity in the conversion from numerical representation to visual color representation.
 
-The ability to resize the window is disabled by default. If it is neccessary for the window to be resized, there is a menu item to do so. This is not reccomended, and will cause the left-mouse click information to be incorrect. Do not change this setting, or resize the window unless you have a very good reason.
-
 Bugs and Feature Requests:
 ----------------
-Place a bug report or feature request in the appropriate location on this project's github page.
+Place a bug report or feature request in the issues tab on this project's github page.
 
 Legal:
 ----------------
